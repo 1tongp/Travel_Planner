@@ -67,16 +67,21 @@ All tools **gracefully fall back** to generic suggestions if a key is missing or
 ```
 travel_agent/
 ├─ .env.example
-├─ requirements.txt
+├─ .gitignore
 ├─ README.md
+├─ requirements.txt
 └─ src/
-   ├─ travel_assistant.py        # Streamlit UI
+   ├─ travel_assistant.py        # Streamlit UI（支持 REAct / StateGraph 切换）
    └─ agents/
       ├─ __init__.py
-      ├─ agent_react.py          # create_react_agent version (prebuilt REAct agent)
+      ├─ agent.py                # 自定义 StateGraph Agent（MemorySaver/工具调用/降噪裁剪）
+      ├─ agent_react.py          # 预置 create_react_agent 版本
       └─ tools/
          ├─ __init__.py
-         └─ utils.py             # SerpAPI helpers & small utilities
+         ├─ flights_finder.py    # 航班查询（SerpAPI，含回退）
+         ├─ hotels_finder.py     # 酒店查询（SerpAPI，含回退）
+         ├─ weather_check.py     # 天气（WeatherAPI，含回退）
+         └─ utils.py             # 公共工具封装、截断/限流等
 ```
 
 ---
@@ -85,5 +90,3 @@ travel_agent/
 - The agent is created with **`langgraph.prebuilt.create_react_agent`** bound to a set of tools (`weather_check`, `find_attractions`, `find_restaurants`, `find_flights_and_hotels`).  
 - The **system prompt** mirrors your screenshot and nudges the LLM to use the tools and return clear, structured Markdown for each day.
 - If your dates are in the far future (beyond forecast horizon), the weather tool switches to a **typical weather hint** and the agent still produces a great plan.
-
-Enjoy, and feel free to extend tools or add your own!
